@@ -1,0 +1,223 @@
+Ayushi Ankita Rakshit
+
+Online Note link:-
+https://notes.io/q5UkF
+
+
+--Database Creation
+create database ClientWork
+
+--Address Table Creation
+create table Address
+(
+address_id int primary key,
+client_id int,
+street nvarchar(50),
+number int,
+zip_code int,
+state nvarchar(20),
+country_id int
+)
+
+--Insertion in Address table
+insert into Address
+values
+(101,2315,'New Town',2,657091,'West Bengal',1),
+(102,2311,'Cannaught Place',5,841009,'New Delhi',1),
+(103,2318,'George Street',21,4003,'Queensland',3),
+(104,2320,'Magnolia Street',88,22611,'Virginia',2),
+(105,2313,'Webster Street',2320,48933,'New Jersey',2),
+(106,2317,'Emirate Road',611,54671,'Dubai',4),
+(107,2314,'Broadway',231,2007,'Sydney',3),
+(108,2312,'Ginza',331,1212,'Hokkaido',5),
+(109,2316,'GT Road',8,800054,'Uttar Pradesh',1),
+(110,2319,'Elizabeth street',681,4005,'Queensland',3)
+
+--Client Table Creation
+create table Client
+(
+client_id int primary key,
+first_name nvarchar(20),
+last_name nvarchar(20),
+age int
+)
+
+--Insertion in Client Table
+insert into Client
+values
+(2311,'Rajesh','Kumar',56),
+(2312,'Shin','Joe',27),
+(2313,'Eden','Aldeo',23),
+(2314,'Christi','Sujen',31),
+(2315,'Ankit','Sen',28),
+(2316,'Sunita','Singh',42),
+(2317,'Sheikh','Abdul',38),
+(2318,'Christofer','Wood',26),
+(2319,'Harper','Obha',43),
+(2320,'Amire','Hopper',23)
+
+--Order Table creation
+create table Orders
+(
+order_id int primary key,
+client_id int,
+date datetime
+)
+
+--Insertion in Order Table
+insert into Orders
+values
+(1,2313,'2022-12-25'),
+(2,2317,'2022-12-28'),
+(3,2314,'2022-12-30'),
+(4,2313,'2023-01-21'),
+(5,2318,'2023-01-26'),
+(6,2317,'2023-01-31'),
+(7,2320,'2023-02-03'),
+(8,2317,'2023-02-15'),
+(9,2312,'2023-02-27'),
+(10,2311,'2023-02-28'),
+(11,2319,'2023-01-12'),
+(12,2311,'2023-01-14')
+
+--Item Table creation
+create table Item
+(
+item_id int primary key,
+order_id int,
+description nvarchar(50),
+value int,
+amount int
+)
+
+--Insertion in Item table
+insert into item
+values
+(1001,3,'Mobile',1,35000),
+(1002,6,'Charger',1,500),
+(1003,1,'Wired Earphones',4,2000),
+(1004,12,'Wireless Earphone',2,4000),
+(1005,7,'Smart Watch',1,5000),
+(1006,2,'Mobile',1,75000),
+(1007,8,'Laptop',1,70000),
+(1008,10,'Watch',2,2500),
+(1009,4,'Charger',1,800),
+(1010,11,'Mobile',1,20000),
+(1011,5,'Clothes',5,6000),
+(1012,9,'Clothes',3,4500)
+
+--Phone Table Creation
+create table Phone
+(
+phone_id int primary key,
+client_id int,
+country_code int,
+phone nvarchar(20)
+)
+
+--Insertion in Phone Table
+insert into Phone
+values
+(50,2315,1,'9876542456'),
+(51,2311,1,'9876567310'),
+(52,2318,3,'67996433'),
+(53,2320,2,'6942290'),
+(54,2313,2,'4654280'),
+(55,2317,4,'2358975'),
+(56,2314,3,'89753578'),
+(57,2312,5,'7890653389'),
+(58,2316,1,'9907842456'),
+(59,2319,3,'77547996')
+
+--Country Table creation
+create table Country
+(
+country_id int primary key,
+name nvarchar(20)
+)
+
+--Insertion in Country Table
+insert into Country
+values
+(1,'India'),
+(2,'US'),
+(3,'Australia'),
+(4,'UAE'),
+(5,'Japan'),
+(6,'Russia'),
+(7,'China'),
+(8,'Germany'),
+(9,'UK'),
+(10,'Canada')
+
+
+--Adding Foregn Key Constraints
+ALTER TABLE Address
+ADD CONSTRAINT FK_ClientAddress
+FOREIGN KEY (client_id) REFERENCES Client(client_id);
+
+ALTER TABLE Address
+ADD CONSTRAINT FK_CountryAddress
+FOREIGN KEY (country_id) REFERENCES Country(country_id);
+
+ALTER TABLE Phone
+ADD CONSTRAINT FK_ClientPhone
+FOREIGN KEY (client_id) REFERENCES Client(client_id);
+
+ALTER TABLE Orders
+ADD CONSTRAINT FK_ClientoOder
+FOREIGN KEY (client_id) REFERENCES Client(client_id);
+
+ALTER TABLE Item
+ADD CONSTRAINT FK_OrderItems
+FOREIGN KEY (order_id) REFERENCES Orders(order_id);
+
+--Updating a Row in Order Table
+UPDATE Orders
+SET date='2023-02-18'
+WHERE order_id=12;
+
+select * from Orders
+
+--Deleting a row in Orders Table
+Delete from Orders 
+where order_id=12
+
+--Selecting all the tables
+select * from Address
+select * from Client
+select * from Country
+select * from item
+select * from Orders
+select * from Phone
+
+--Creating Stored Procedure
+create Procedure SP_getOrderDetails
+AS
+Begin
+	select A.address_id,C.first_name,C.last_name,O.order_id,O.date
+	from Client C
+	inner join Address A
+	on A.client_id=C.client_id
+	inner join Orders O
+	on C.client_id=O.client_id
+END
+
+EXEC SP_getOrderDetails
+
+--Creating Parameterized Stored procedure
+CREATE PROCEDURE SP_getItemDescription
+( 
+@itemID int 
+) 
+AS 
+BEGIN 
+	SELECT C.first_name,C.last_name,I.description,I.amount,O.order_id 
+	FROM Orders O 
+	join Client C on O.client_id=C.client_id
+	join Item I on O.order_id=I.order_id
+	WHERE I.item_id=@itemID 
+END 
+
+EXEC SP_getItemDescription 1002;
+
